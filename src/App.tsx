@@ -209,4 +209,4 @@ const AzrachITMeetingBookingApp = () => {
   );
 };
 
-export default AzrachITMeetingBookingApp;
+export default App;

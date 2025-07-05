@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, MapPin, Plus, X, Check, AlertCircle, Building2, Snowflake, Volume2 } from 'lucide-react';
+import { Calendar, Clock, Users, MapPin, Plus, X, Check, AlertCircle, Building2, Snowflake, Volume2, Type, FileText, Hash } from 'lucide-react';
 
 // IMPORTANT: Make sure this URL is correct for your live backend
 const API_URL = 'https://azrachit-booking-api.onrender.com/api';
@@ -204,9 +204,9 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 font-sans">
       {/* Header */}
-      <header className="bg-white shadow-md sticky top-0 z-40">
+      <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center py-4 gap-4 sm:gap-0">
             <div className="flex items-center space-x-4">
@@ -219,12 +219,12 @@ const App = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
-              <div className="flex-1 flex items-center space-x-2 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200">
+              <div className="flex-1 flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm">
                 <Calendar className="w-5 h-5 text-slate-500" />
                 <input
                   type="date"
                   value={selectedDate}
-                  min={today} // This line disables past dates
+                  min={today}
                   onChange={(e) => setSelectedDate(e.target.value)}
                   className="bg-transparent border-none focus:outline-none text-slate-700 font-medium text-sm w-full"
                 />
@@ -240,7 +240,7 @@ const App = () => {
                   }
                 }}
                 disabled={loading}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm hover:shadow-md flex-shrink-0"
+                className="bg-gradient-to-br from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg active:scale-95"
               >
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline">Book Room</span>
@@ -262,11 +262,10 @@ const App = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Room Info Card */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-8 border border-slate-200">
+        <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-6 mb-8 border border-slate-200/80">
           <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-            {/* Left Side: Details */}
             <div className="w-full md:w-auto">
-              <div className="flex items-center space-x-3 mb-2">
+              <div className="flex items-center space-x-3 mb-3">
                 <Building2 className="w-7 h-7 text-blue-600 flex-shrink-0" />
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{meetingRoom.name}</h2>
               </div>
@@ -290,9 +289,7 @@ const App = () => {
                 ))}
               </div>
             </div>
-            
-            {/* Right Side: Booking Count */}
-            <div className="text-center bg-slate-50 p-4 rounded-lg border border-slate-200 w-full md:w-auto flex-shrink-0">
+            <div className="text-center bg-slate-50/80 p-4 rounded-lg border border-slate-200 w-full md:w-auto flex-shrink-0">
               <div className="text-4xl font-bold text-blue-600">{getDateBookings().length}</div>
               <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">
                 Bookings
@@ -302,7 +299,7 @@ const App = () => {
         </div>
 
         {/* Schedule */}
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-slate-200">
+        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-slate-200/80">
           <h2 className="text-xl font-bold text-slate-800 mb-4">
             Schedule for {formatDate(selectedDate)}
           </h2>
@@ -312,7 +309,7 @@ const App = () => {
                     <p>Loading schedule...</p>
                 </div>
             ) : getDateBookings().length === 0 ? (
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-slate-400">
                 <Calendar className="w-12 h-12 mx-auto text-slate-300 mb-2" />
                 <p className="font-medium">No bookings for this date.</p>
                 <p className="text-sm">The room is available all day.</p>
@@ -321,7 +318,7 @@ const App = () => {
               getDateBookings()
                 .sort((a, b) => (a as any).startTime.localeCompare((b as any).startTime))
                 .map((booking) => (
-                  <div key={(booking as any).id} className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-blue-300 transition-all">
+                  <div key={(booking as any).id} className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-blue-400 hover:shadow-sm transition-all duration-300">
                     <div className="flex justify-between items-start gap-4">
                       <div className="flex-1">
                         <h3 className="font-bold text-slate-800">{(booking as any).title}</h3>
@@ -359,23 +356,26 @@ const App = () => {
 
       {/* Booking Form Modal */}
       {showBookingForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full animate-in fade-in-0 zoom-in-95">
             <div className="p-6 border-b border-slate-200 flex justify-between items-center">
               <h2 className="text-lg font-bold text-slate-800">Book Conference Room</h2>
-              <button onClick={() => setShowBookingForm(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-full">
+              <button onClick={() => setShowBookingForm(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Meeting Title *</label>
-                <input type="text" value={bookingForm.title} onChange={(e) => setBookingForm({ ...bookingForm, title: e.target.value })} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Weekly Sync" />
+                <div className="relative">
+                  <Type className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input type="text" value={bookingForm.title} onChange={(e) => setBookingForm({ ...bookingForm, title: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Weekly Sync" />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Start Time *</label>
-                  <select value={bookingForm.startTime} onChange={(e) => setBookingForm({ ...bookingForm, startTime: e.target.value })} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select value={bookingForm.startTime} onChange={(e) => setBookingForm({ ...bookingForm, startTime: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Select</option>
                     {timeSlots.map(time => (
                       <option key={time} value={time} disabled={isTimeInPast(time)} className={isTimeInPast(time) ? 'text-slate-400' : ''}>
@@ -386,7 +386,7 @@ const App = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">End Time *</label>
-                  <select value={bookingForm.endTime} onChange={(e) => setBookingForm({ ...bookingForm, endTime: e.target.value })} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={!bookingForm.startTime}>
+                  <select value={bookingForm.endTime} onChange={(e) => setBookingForm({ ...bookingForm, endTime: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={!bookingForm.startTime}>
                     <option value="">Select</option>
                     {timeSlots.filter(time => !bookingForm.startTime || time > bookingForm.startTime).map(time => (
                       <option key={time} value={time} disabled={isTimeInPast(time)} className={isTimeInPast(time) ? 'text-slate-400' : ''}>
@@ -398,16 +398,22 @@ const App = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Attendees</label>
-                <input type="number" value={bookingForm.attendees} onChange={(e) => setBookingForm({ ...bookingForm, attendees: e.target.value })} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder={`Max: ${meetingRoom.capacity}`} min="1" max={meetingRoom.capacity} />
+                <div className="relative">
+                  <Users className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input type="number" value={bookingForm.attendees} onChange={(e) => setBookingForm({ ...bookingForm, attendees: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder={`Max: ${meetingRoom.capacity}`} min="1" max={meetingRoom.capacity} />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Notes</label>
-                <textarea value={bookingForm.notes} onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" rows={3} placeholder="e.g., Agenda items..." />
+                <div className="relative">
+                  <FileText className="w-5 h-5 text-slate-400 absolute left-3 top-3" />
+                  <textarea value={bookingForm.notes} onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows={3} placeholder="e.g., Agenda items..." />
+                </div>
               </div>
             </div>
-            <div className="p-6 bg-slate-50 border-t border-slate-200 flex justify-end space-x-3">
-              <button onClick={() => setShowBookingForm(false)} className="bg-white text-slate-700 py-2 px-4 rounded-md hover:bg-slate-100 border border-slate-300 transition-colors font-semibold">Cancel</button>
-              <button onClick={handleBookRoom} disabled={loading} className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-all font-semibold">
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end space-x-3">
+              <button onClick={() => setShowBookingForm(false)} className="bg-white text-slate-700 py-2 px-4 rounded-lg hover:bg-slate-100 border border-slate-300 transition-all font-semibold active:scale-95">Cancel</button>
+              <button onClick={handleBookRoom} disabled={loading} className="bg-gradient-to-br from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 transition-all font-semibold shadow-md hover:shadow-lg active:scale-95">
                 {loading ? 'Booking...' : 'Confirm Booking'}
               </button>
             </div>

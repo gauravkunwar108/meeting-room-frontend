@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, MapPin, Plus, X, Check, AlertCircle, Building2, Snowflake, Volume2 } from 'lucide-react';
 
-// Make sure to replace this with your actual Render URL
+// IMPORTANT: Replace this with your actual, correct Render URL
 const API_URL = 'https://azrachit-booking-api.onrender.com/api';
 
 const App = () => {
@@ -182,7 +182,7 @@ const App = () => {
     return selectedDate === new Date().toISOString().split('T')[0];
   };
 
-  const AzrachITLogo = ({ size = 'md' }) => {
+  const AzrachITLogo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
     const sizeClasses: { [key: string]: string } = { sm: 'w-8 h-8', md: 'w-12 h-12', lg: 'w-16 h-16' };
     return (
       <div className={`${sizeClasses[size]} relative`}>

@@ -83,7 +83,7 @@ const App = () => {
   }, [selectedDate]);
 
   const meetingRoom = {
-    name: 'AzrachIT Conference Suite',
+    name: 'AzrachIT Huddle Room',
     capacity: 10,
     location: 'Prabhu Bank Building, Gabahal Road',
     amenities: ['Air Conditioning', 'Sound Proof']
@@ -204,7 +204,7 @@ const App = () => {
                 <h1 className="text-xl sm:text-2xl font-bold text-slate-800">
                   Meeting Room Booking
                 </h1>
-                <p className="text-slate-500 text-sm">AzrachIT Conference Management</p>
+                <p className="text-slate-500 text-sm">AzrachIT Room Scheduler</p>
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
@@ -342,7 +342,7 @@ const App = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-md w-full animate-in fade-in-0 zoom-in-95">
             <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-slate-800">Book Conference Room</h2>
+              <h2 className="text-lg font-bold text-slate-800">Book Meeting Room</h2>
               <button onClick={() => setShowBookingForm(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
                 <X className="w-5 h-5" />
               </button>

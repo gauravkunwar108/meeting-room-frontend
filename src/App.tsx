@@ -18,8 +18,40 @@ const App = () => {
   const [notification, setNotification] = useState<{ message: string; type: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Get today's date in YYYY-MM-DD format for the min attribute
   const today = new Date().toISOString().split('T')[0];
+
+  const isSelectedDateToday = () => selectedDate === today;
+
+  const generateTimeSlots = () => {
+    const slots = [];
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
+    // Loop from 8 AM to 5 PM
+    for (let hour = 8; hour <= 17; hour++) {
+      // Loop through 15-minute intervals
+      for (let minute = 0; minute < 60; minute += 15) {
+        // Skip times before 8:30 AM
+        if (hour === 8 && minute < 30) continue;
+        // Skip times after 5:30 PM
+        if (hour === 17 && minute > 30) continue;
+
+        // If the selected date is today, check if the time has passed
+        if (isSelectedDateToday()) {
+          if (hour < currentHour || (hour === currentHour && minute < currentMinute)) {
+            continue; // Skip past time slots
+          }
+        }
+
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        slots.push(timeString);
+      }
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -48,45 +80,6 @@ const App = () => {
     amenities: ['Air Conditioning', 'Sound Proof']
   };
 
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 8; hour <= 18; hour++) {
-      for (let minute = 0; minute < 60; minute += 15) {
-        if (hour === 18 && minute > 0) break;
-        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        slots.push(timeString);
-      }
-    }
-    return slots;
-  };
-
-  const timeSlots = generateTimeSlots();
-
-  const getCurrentTimeBlock = () => {
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const roundedMinute = Math.ceil(currentMinute / 15) * 15;
-    
-    if (roundedMinute >= 60) {
-      return `${(currentHour + 1).toString().padStart(2, '0')}:00`;
-    }
-    return `${currentHour.toString().padStart(2, '0')}:${roundedMinute.toString().padStart(2, '0')}`;
-  };
-
-  const isTimeInPast = (time: string) => {
-    if (selectedDate !== new Date().toISOString().split('T')[0]) {
-      return false;
-    }
-    
-    const now = new Date();
-    const [hours, minutes] = time.split(':').map(Number);
-    const timeDate = new Date();
-    timeDate.setHours(hours, minutes, 0, 0);
-    
-    return timeDate < now;
-  };
-
   const showNotification = (message: string, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
@@ -99,10 +92,6 @@ const App = () => {
     }
     if (bookingForm.startTime >= bookingForm.endTime) {
       showNotification('End time must be after start time', 'error');
-      return;
-    }
-    if (isTimeInPast(bookingForm.startTime)) {
-      showNotification('Cannot book meetings in the past', 'error');
       return;
     }
     if (bookingForm.attendees && parseInt(bookingForm.attendees) > meetingRoom.capacity) {
@@ -127,7 +116,7 @@ const App = () => {
         throw new Error(result.error || 'Failed to book the room.');
       }
 
-      setBookings([...bookings, result]);
+      setBookings([...bookings, result].sort((a,b) => a.startTime.localeCompare(b.startTime)));
       setShowBookingForm(false);
       setBookingForm({ title: '', startTime: '', endTime: '', attendees: '', notes: '' });
       showNotification('Meeting room booked successfully!');
@@ -159,11 +148,6 @@ const App = () => {
     return bookings.filter(booking => (booking as any).date === selectedDate);
   };
 
-  const getTodayBookings = () => {
-    const today = new Date().toISOString().split('T')[0];
-    return bookings.filter(booking => (booking as any).date === today);
-  };
-
   const formatTime = (time: string) => {
     return new Date(`2000-01-01T${time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
@@ -179,10 +163,6 @@ const App = () => {
       month: 'long', 
       day: 'numeric' 
     });
-  };
-
-  const isSelectedDateToday = () => {
-    return selectedDate === new Date().toISOString().split('T')[0];
   };
 
   const AzrachITLogo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
@@ -232,12 +212,7 @@ const App = () => {
               <button
                 onClick={() => {
                   setShowBookingForm(true);
-                  if (isSelectedDateToday()) {
-                    const currentTimeBlock = getCurrentTimeBlock();
-                    setBookingForm(prev => ({ ...prev, startTime: currentTimeBlock, endTime: '' }));
-                  } else {
-                    setBookingForm(prev => ({ ...prev, startTime: '09:00', endTime: '' }));
-                  }
+                  setBookingForm(prev => ({ ...prev, startTime: '', endTime: '' }));
                 }}
                 disabled={loading}
                 className="bg-gradient-to-br from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg active:scale-95"
@@ -316,7 +291,6 @@ const App = () => {
               </div>
             ) : (
               getDateBookings()
-                .sort((a, b) => (a as any).startTime.localeCompare((b as any).startTime))
                 .map((booking) => (
                   <div key={(booking as any).id} className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-blue-400 hover:shadow-sm transition-all duration-300">
                     <div className="flex justify-between items-start gap-4">
@@ -378,8 +352,8 @@ const App = () => {
                   <select value={bookingForm.startTime} onChange={(e) => setBookingForm({ ...bookingForm, startTime: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Select</option>
                     {timeSlots.map(time => (
-                      <option key={time} value={time} disabled={isTimeInPast(time)} className={isTimeInPast(time) ? 'text-slate-400' : ''}>
-                        {formatTime(time)} {isTimeInPast(time) ? '(Past)' : ''}
+                      <option key={time} value={time}>
+                        {formatTime(time)}
                       </option>
                     ))}
                   </select>
@@ -388,11 +362,13 @@ const App = () => {
                   <label className="block text-sm font-medium text-slate-700 mb-1">End Time *</label>
                   <select value={bookingForm.endTime} onChange={(e) => setBookingForm({ ...bookingForm, endTime: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={!bookingForm.startTime}>
                     <option value="">Select</option>
-                    {timeSlots.filter(time => !bookingForm.startTime || time > bookingForm.startTime).map(time => (
-                      <option key={time} value={time} disabled={isTimeInPast(time)} className={isTimeInPast(time) ? 'text-slate-400' : ''}>
-                        {formatTime(time)} {isTimeInPast(time) ? '(Past)' : ''}
-                      </option>
-                    ))}
+                    {generateTimeSlots()
+                      .filter(time => !bookingForm.startTime || time > bookingForm.startTime)
+                      .map(time => (
+                        <option key={time} value={time}>
+                          {formatTime(time)}
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>

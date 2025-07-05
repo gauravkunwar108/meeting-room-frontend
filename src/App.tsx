@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, MapPin, Plus, X, Check, AlertCircle, Building2, Snowflake, Volume2, Type, FileText, Hash } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Calendar, Clock, Users, MapPin, Plus, X, Check, AlertCircle, Building2, Snowflake, Volume2, Type, FileText } from 'lucide-react';
 
 // IMPORTANT: Make sure this URL is correct for your live backend
 const API_URL = 'https://azrachit-booking-api.onrender.com/api';
@@ -20,38 +20,47 @@ const App = () => {
 
   const today = new Date().toISOString().split('T')[0];
 
-  const isSelectedDateToday = () => selectedDate === today;
-
-  const generateTimeSlots = () => {
+  // Memoize the calculation of available time slots
+  const availableTimeSlots = useMemo(() => {
     const slots = [];
     const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
+    const isToday = selectedDate === today;
 
-    // Loop from 8 AM to 5 PM
+    // Helper to check if a slot is within a booked range
+    const isSlotBooked = (slot: string) => {
+      return bookings.some(booking => {
+        return slot >= booking.startTime && slot < booking.endTime;
+      });
+    };
+
+    // Generate slots from 8:30 AM to 5:30 PM
     for (let hour = 8; hour <= 17; hour++) {
-      // Loop through 15-minute intervals
       for (let minute = 0; minute < 60; minute += 15) {
-        // Skip times before 8:30 AM
-        if (hour === 8 && minute < 30) continue;
-        // Skip times after 5:30 PM
-        if (hour === 17 && minute > 30) continue;
-
-        // If the selected date is today, check if the time has passed
-        if (isSelectedDateToday()) {
-          if (hour < currentHour || (hour === currentHour && minute < currentMinute)) {
-            continue; // Skip past time slots
-          }
+        if ((hour === 8 && minute < 30) || (hour === 17 && minute > 30)) {
+          continue;
         }
 
         const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        
+        // Skip past time slots on the current day
+        if (isToday) {
+          const slotTime = new Date(`${selectedDate}T${timeString}`);
+          if (slotTime < now) {
+            continue;
+          }
+        }
+
+        // Skip if the slot is already booked
+        if (isSlotBooked(timeString)) {
+          continue;
+        }
+        
         slots.push(timeString);
       }
     }
     return slots;
-  };
+  }, [selectedDate, bookings, today]);
 
-  const timeSlots = generateTimeSlots();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -62,7 +71,7 @@ const App = () => {
           throw new Error('Failed to fetch bookings from the server.');
         }
         const data = await response.json();
-        setBookings(data);
+        setBookings(data.sort((a: any, b: any) => a.startTime.localeCompare(b.startTime)));
       } catch (error: any) {
         showNotification(error.message, 'error');
       } finally {
@@ -149,7 +158,7 @@ const App = () => {
   };
 
   const formatTime = (time: string) => {
-    return new Date(`2000-01-01T${time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(`2000-01-01T${time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
   const formatDate = (dateString: string) => {
@@ -199,20 +208,20 @@ const App = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
-              <div className="flex-1 flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm">
-                <Calendar className="w-5 h-5 text-slate-500" />
-                <input
+              <div className="relative flex-1">
+                 <Calendar className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                 <input
                   type="date"
                   value={selectedDate}
                   min={today}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="bg-transparent border-none focus:outline-none text-slate-700 font-medium text-sm w-full"
+                  className="bg-white pl-10 pr-3 py-2 rounded-lg border border-slate-200 shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <button
                 onClick={() => {
                   setShowBookingForm(true);
-                  setBookingForm(prev => ({ ...prev, startTime: '', endTime: '' }));
+                  setBookingForm({ title: '', startTime: '', endTime: '', attendees: '', notes: '' });
                 }}
                 disabled={loading}
                 className="bg-gradient-to-br from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg active:scale-95"
@@ -351,23 +360,23 @@ const App = () => {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Start Time *</label>
                   <select value={bookingForm.startTime} onChange={(e) => setBookingForm({ ...bookingForm, startTime: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Select</option>
-                    {timeSlots.map(time => (
-                      <option key={time} value={time}>
-                        {formatTime(time)}
-                      </option>
-                    ))}
+                    {availableTimeSlots.length > 0 ? (
+                      availableTimeSlots.map(time => (
+                        <option key={time} value={time}>{formatTime(time)}</option>
+                      ))
+                    ) : (
+                      <option disabled>No time slots available</option>
+                    )}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">End Time *</label>
                   <select value={bookingForm.endTime} onChange={(e) => setBookingForm({ ...bookingForm, endTime: e.target.value })} className="w-full bg-slate-50 border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={!bookingForm.startTime}>
                     <option value="">Select</option>
-                    {generateTimeSlots()
+                    {availableTimeSlots
                       .filter(time => !bookingForm.startTime || time > bookingForm.startTime)
                       .map(time => (
-                        <option key={time} value={time}>
-                          {formatTime(time)}
-                        </option>
+                        <option key={time} value={time}>{formatTime(time)}</option>
                       ))}
                   </select>
                 </div>

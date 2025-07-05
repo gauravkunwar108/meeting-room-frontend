@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, MapPin, Plus, X, Check, AlertCircle, Building2, Snowflake, Volume2 } from 'lucide-react';
 
 // Define the backend API URL
-const API_URL = 'https://azrachit-booking-api.onrender.com/api';
+const API_URL = 'https://azrachit-booking-api.onrender.com';
 
 const AzrachITMeetingBookingApp = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);

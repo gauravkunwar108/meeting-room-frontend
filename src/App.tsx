@@ -4,7 +4,7 @@ import { Calendar, Clock, Users, MapPin, Plus, X, Check, AlertCircle, Building2,
 // Define the backend API URL
 const API_URL = 'https://azrachit-booking-api.onrender.com/api';
 
-const AzrachITMeetingBookingApp = () => {
+const App = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [bookings, setBookings] = useState([]);
   const [showBookingForm, setShowBookingForm] = useState(false);

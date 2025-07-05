@@ -215,7 +215,7 @@ const App = () => {
                   value={selectedDate}
                   min={today}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="bg-white pl-10 pr-3 py-2 rounded-lg border border-slate-200 shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="bg-white pl-10 pr-3 py-2 rounded-lg border border-slate-200 shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
                 />
               </div>
               <button
@@ -236,7 +236,7 @@ const App = () => {
 
       {/* Notification */}
       {notification && (
-        <div className={`fixed top-24 sm:top-20 right-4 z-50 flex items-center space-x-3 px-4 py-3 rounded-lg shadow-lg ${
+        <div className={`fixed top-24 sm:top-20 right-4 z-[60] flex items-center space-x-3 px-4 py-3 rounded-lg shadow-lg ${
           notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
         }`}>
           {notification.type === 'success' ? <Check className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
@@ -365,7 +365,7 @@ const App = () => {
                         <option key={time} value={time}>{formatTime(time)}</option>
                       ))
                     ) : (
-                      <option disabled>No time slots available</option>
+                      <option disabled>No slots available</option>
                     )}
                   </select>
                 </div>

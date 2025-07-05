@@ -185,7 +185,7 @@ const App = () => {
   const AzrachITLogo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
     const sizeClasses: { [key: string]: string } = { sm: 'w-8 h-8', md: 'w-12 h-12', lg: 'w-16 h-16' };
     return (
-      <div className={`${sizeClasses[size]} relative`}>
+      <div className={`${sizeClasses[size]} relative flex-shrink-0`}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <defs>
             <linearGradient id="azrachit-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -203,26 +203,26 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Header */}
-      <header className="bg-white shadow-md">
+      <header className="bg-white shadow-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-4 gap-4 sm:gap-0">
             <div className="flex items-center space-x-4">
               <AzrachITLogo size="md" />
               <div>
-                <h1 className="text-2xl font-bold text-slate-800">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-800">
                   Meeting Room Booking
                 </h1>
                 <p className="text-slate-500 text-sm">AzrachIT Conference Management</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200">
+            <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+              <div className="flex-1 flex items-center space-x-2 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200">
                 <Calendar className="w-5 h-5 text-slate-500" />
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="bg-transparent border-none focus:outline-none text-slate-700 font-medium text-sm"
+                  className="bg-transparent border-none focus:outline-none text-slate-700 font-medium text-sm w-full"
                 />
               </div>
               <button
@@ -236,10 +236,10 @@ const App = () => {
                   }
                 }}
                 disabled={loading}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2 shadow-sm hover:shadow-md"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm hover:shadow-md flex-shrink-0"
               >
                 <Plus className="w-5 h-5" />
-                <span>Book Room</span>
+                <span className="hidden sm:inline">Book Room</span>
               </button>
             </div>
           </div>
@@ -248,7 +248,7 @@ const App = () => {
 
       {/* Notification */}
       {notification && (
-        <div className={`fixed top-20 right-4 z-50 flex items-center space-x-3 px-4 py-3 rounded-lg shadow-lg ${
+        <div className={`fixed top-24 sm:top-20 right-4 z-50 flex items-center space-x-3 px-4 py-3 rounded-lg shadow-lg ${
           notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
         }`}>
           {notification.type === 'success' ? <Check className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
@@ -257,14 +257,14 @@ const App = () => {
       )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* UPDATED Room Info Card */}
+        {/* Room Info Card */}
         <div className="bg-white/70 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-8 border border-slate-200">
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-6">
             {/* Left Side: Details */}
-            <div>
+            <div className="w-full md:w-auto">
               <div className="flex items-center space-x-3 mb-2">
-                <Building2 className="w-7 h-7 text-blue-600" />
-                <h2 className="text-2xl font-bold text-slate-800">{meetingRoom.name}</h2>
+                <Building2 className="w-7 h-7 text-blue-600 flex-shrink-0" />
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{meetingRoom.name}</h2>
               </div>
               <div className="pl-10 space-y-2 text-slate-600">
                 <div className="flex items-center space-x-2 text-sm">
@@ -276,7 +276,7 @@ const App = () => {
                   <span>{meetingRoom.location}</span>
                 </div>
               </div>
-              <div className="pl-10 mt-4 flex items-center space-x-2">
+              <div className="pl-10 mt-4 flex flex-wrap gap-2">
                 {meetingRoom.amenities.map((amenity, index) => (
                   <div key={amenity} className="flex items-center space-x-2 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
                     {index === 0 && <Snowflake className="w-4 h-4" />}
@@ -288,7 +288,7 @@ const App = () => {
             </div>
             
             {/* Right Side: Booking Count */}
-            <div className="text-center bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <div className="text-center bg-slate-50 p-4 rounded-lg border border-slate-200 w-full md:w-auto flex-shrink-0">
               <div className="text-4xl font-bold text-blue-600">{getDateBookings().length}</div>
               <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">
                 Bookings
@@ -297,61 +297,58 @@ const App = () => {
           </div>
         </div>
 
-        {/* ... Rest of the JSX remains the same ... */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-200">
-              <h2 className="text-xl font-bold text-slate-800 mb-4">
-                Schedule for {formatDate(selectedDate)}
-              </h2>
-              <div className="space-y-4">
-                {getDateBookings().length === 0 ? (
-                  <div className="text-center py-12 text-slate-500">
-                    <Calendar className="w-12 h-12 mx-auto text-slate-300 mb-2" />
-                    <p className="font-medium">No bookings for this date.</p>
-                    <p className="text-sm">The room is available all day.</p>
-                  </div>
-                ) : (
-                  getDateBookings()
-                    .sort((a, b) => (a as any).startTime.localeCompare((b as any).startTime))
-                    .map((booking) => (
-                      <div key={(booking as any).id} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-bold text-slate-800">{(booking as any).title}</h3>
-                            <div className="flex items-center space-x-4 text-sm text-slate-600 mt-1">
-                                <div className="flex items-center space-x-1.5">
-                                  <Clock className="w-4 h-4 text-blue-500" />
-                                  <span>{formatTime((booking as any).startTime)} - {formatTime((booking as any).endTime)}</span>
-                                </div>
-                                {(booking as any).attendees && (
-                                  <div className="flex items-center space-x-1.5">
-                                    <Users className="w-4 h-4 text-blue-500" />
-                                    <span>{(booking as any).attendees} attendees</span>
-                                  </div>
-                                )}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleCancelBooking((booking as any).id)}
-                            className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                        {(booking as any).notes && (
-                          <div className="text-sm text-slate-500 bg-white p-3 mt-3 rounded-md border border-slate-200">
-                            {(booking as any).notes}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                )}
+        {/* Schedule */}
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-slate-200">
+          <h2 className="text-xl font-bold text-slate-800 mb-4">
+            Schedule for {formatDate(selectedDate)}
+          </h2>
+          <div className="space-y-4">
+            {loading ? (
+                <div className="text-center py-12 text-slate-500">
+                    <p>Loading schedule...</p>
+                </div>
+            ) : getDateBookings().length === 0 ? (
+              <div className="text-center py-12 text-slate-500">
+                <Calendar className="w-12 h-12 mx-auto text-slate-300 mb-2" />
+                <p className="font-medium">No bookings for this date.</p>
+                <p className="text-sm">The room is available all day.</p>
               </div>
-            </div>
-          </div>
-          <div className="lg:col-span-1">
-            {/* Today's Overview could be another card here if needed */}
+            ) : (
+              getDateBookings()
+                .sort((a, b) => (a as any).startTime.localeCompare((b as any).startTime))
+                .map((booking) => (
+                  <div key={(booking as any).id} className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-blue-300 transition-all">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-slate-800">{(booking as any).title}</h3>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-slate-600 mt-1">
+                            <div className="flex items-center space-x-1.5">
+                              <Clock className="w-4 h-4 text-blue-500" />
+                              <span>{formatTime((booking as any).startTime)} - {formatTime((booking as any).endTime)}</span>
+                            </div>
+                            {(booking as any).attendees && (
+                              <div className="flex items-center space-x-1.5 mt-1 sm:mt-0">
+                                <Users className="w-4 h-4 text-blue-500" />
+                                <span>{(booking as any).attendees} attendees</span>
+                              </div>
+                            )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleCancelBooking((booking as any).id)}
+                        className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full transition-colors flex-shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {(booking as any).notes && (
+                      <div className="text-sm text-slate-600 bg-white p-3 mt-3 rounded-md border border-slate-200 whitespace-pre-wrap">
+                        {(booking as any).notes}
+                      </div>
+                    )}
+                  </div>
+                ))
+            )}
           </div>
         </div>
       </main>

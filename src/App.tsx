@@ -18,6 +18,9 @@ const App = () => {
   const [notification, setNotification] = useState<{ message: string; type: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Get today's date in YYYY-MM-DD format for the min attribute
+  const today = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
     const fetchBookings = async () => {
       setLoading(true);
@@ -221,6 +224,7 @@ const App = () => {
                 <input
                   type="date"
                   value={selectedDate}
+                  min={today} // This line disables past dates
                   onChange={(e) => setSelectedDate(e.target.value)}
                   className="bg-transparent border-none focus:outline-none text-slate-700 font-medium text-sm w-full"
                 />
